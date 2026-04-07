@@ -6,6 +6,8 @@ import { Login } from './pages/Login'
 import { Signup } from './pages/Signup'
 import { ForgotPassword } from './pages/ForgotPassword'
 import { Dashboard } from './pages/Dashboard'
+import { Cards } from './pages/Cards'
+import { Invoice } from './pages/Invoice'
 
 function App() {
   return (
@@ -21,6 +23,22 @@ function App() {
             element={
               <PrivateRoute>
                 <Dashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/cards"
+            element={
+              <PrivateRoute>
+                <Cards />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/cards/:cardId/invoice"
+            element={
+              <PrivateRoute>
+                <Invoice />
               </PrivateRoute>
             }
           />
