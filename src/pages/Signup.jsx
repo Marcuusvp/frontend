@@ -83,7 +83,7 @@ export function Signup() {
             className={`auth-button ${loading ? 'loading' : ''}`}
             disabled={loading}
           >
-            {loading ? '' : 'Cadastrar'}
+            {loading ? <span className="btn-spinner" /> : 'Cadastrar'}
           </button>
         </form>
         <div className="auth-links">

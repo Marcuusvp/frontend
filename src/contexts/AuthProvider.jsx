@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { AuthContext } from './AuthContext'
+import { LoadingScreen } from '../components/LoadingScreen'
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [initialized, setInitialized] = useState(false)
 
   useEffect(() => {
     // Get initial session
@@ -13,6 +15,7 @@ export function AuthProvider({ children }) {
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
+      setInitialized(true)
     })
 
     // Listen for auth changes
@@ -63,6 +66,15 @@ export function AuthProvider({ children }) {
     signUp,
     signOut,
     resetPassword,
+  }
+
+  // Show loading screen during initial auth check
+  if (!initialized) {
+    return (
+      <AuthContext.Provider value={value}>
+        <LoadingScreen message="Iniciando..." />
+      </AuthContext.Provider>
+    )
   }
 
   return (

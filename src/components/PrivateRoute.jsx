@@ -1,15 +1,12 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { LoadingScreen } from './LoadingScreen'
 
 export function PrivateRoute({ children }) {
   const { user, loading } = useAuth()
 
   if (loading) {
-    return (
-      <div className="loading-container">
-        <p>Carregando...</p>
-      </div>
-    )
+    return <LoadingScreen message="Verificando autenticação..." />
   }
 
   if (!user) {

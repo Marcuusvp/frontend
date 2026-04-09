@@ -1,62 +1,15 @@
 import { useEffect, useState } from 'react'
-import { useAuth } from '../hooks/useAuth'
 import { useCards } from '../hooks/useCards'
 import { EmptyState } from '../components/EmptyState'
 import { CardItem } from '../components/CardItem'
 import { CardForm } from '../components/CardForm'
+import { DeleteConfirmModal } from '../components/DeleteConfirmModal'
+import { LoadingScreen } from '../components/LoadingScreen'
+import { ErrorState } from '../components/ErrorState'
 import '../styles/cards.css'
 
-function DeleteConfirmModal({ card, onClose, onConfirm }) {
-  const [loading, setLoading] = useState(false)
-
-  const handleConfirm = async () => {
-    setLoading(true)
-    await onConfirm()
-    setLoading(false)
-  }
-
-  return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="delete-confirm">
-          <div className="delete-confirm-icon">
-            <svg
-              width="48"
-              height="48"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-              <line x1="12" y1="9" x2="12" y2="13" />
-              <line x1="12" y1="17" x2="12.01" y2="17" />
-            </svg>
-          </div>
-          <h3>Excluir cartão?</h3>
-          <p>
-            Tem certeza que deseja excluir o cartão <strong>{card?.name}</strong>?
-            Esta ação não pode ser desfeita.
-          </p>
-          <div className="delete-confirm-actions">
-            <button className="btn-secondary" onClick={onClose} disabled={loading}>
-              Cancelar
-            </button>
-            <button className="btn-danger" onClick={handleConfirm} disabled={loading}>
-              {loading ? 'Excluindo...' : 'Excluir'}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export function Cards() {
-  const { user, signOut } = useAuth()
-  const { cards, loading, fetchCards, createCard, updateCard, deleteCard } = useCards()
+  const { cards, loading, error, fetchCards, createCard, updateCard, deleteCard } = useCards()
   const [showForm, setShowForm] = useState(false)
   const [editingCard, setEditingCard] = useState(null)
   const [deletingCard, setDeletingCard] = useState(null)
@@ -64,10 +17,6 @@ export function Cards() {
   useEffect(() => {
     fetchCards()
   }, [fetchCards])
-
-  const handleLogout = async () => {
-    await signOut()
-  }
 
   const handleAddNew = () => {
     setEditingCard(null)
@@ -100,27 +49,33 @@ export function Cards() {
     return result
   }
 
+  if (loading) {
+    return <LoadingScreen message="Carregando cartões..." />
+  }
+
+  if (error) {
+    return (
+      <div className="cards-page-content">
+        <main className="cards-main">
+          <ErrorState error={error} onRetry={fetchCards} />
+        </main>
+      </div>
+    )
+  }
+
   return (
-    <div className="cards-page">
-      <header className="cards-header">
+    <div className="cards-page-content">
+      <header className="page-header">
         <h1>Meus Cartões</h1>
-        <div className="cards-header-actions">
-          <span className="user-email">{user?.email}</span>
+        <div className="page-header-right">
           <button className="btn-primary" onClick={handleAddNew}>
             + Novo Cartão
-          </button>
-          <button className="btn-secondary" onClick={handleLogout} style={{ color: 'white', borderColor: 'rgba(255,255,255,0.5)' }}>
-            Sair
           </button>
         </div>
       </header>
 
       <main className="cards-main">
-        {loading ? (
-          <div className="empty-state">
-            <p>Carregando cartões...</p>
-          </div>
-        ) : cards.length === 0 ? (
+        {cards.length === 0 ? (
           <EmptyState
             title="Nenhum cartão cadastrado"
             description="Cadastre seus cartões de crédito para começar a controlar suas faturas."
@@ -152,7 +107,8 @@ export function Cards() {
 
       {deletingCard && (
         <DeleteConfirmModal
-          card={deletingCard}
+          title="Excluir cartão?"
+          itemName={deletingCard.name}
           onClose={() => setDeletingCard(null)}
           onConfirm={handleConfirmDelete}
         />

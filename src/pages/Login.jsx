@@ -60,7 +60,7 @@ export function Login() {
             className={`auth-button ${loading ? 'loading' : ''}`}
             disabled={loading}
           >
-            {loading ? '' : 'Entrar'}
+            {loading ? <span className="btn-spinner" /> : 'Entrar'}
           </button>
         </form>
         <div className="auth-links">

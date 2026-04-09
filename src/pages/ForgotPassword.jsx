@@ -53,7 +53,7 @@ export function ForgotPassword() {
               className={`auth-button ${loading ? 'loading' : ''}`}
               disabled={loading}
             >
-              {loading ? '' : 'Enviar instruções'}
+              {loading ? <span className="btn-spinner" /> : 'Enviar instruções'}
             </button>
           </form>
         ) : (

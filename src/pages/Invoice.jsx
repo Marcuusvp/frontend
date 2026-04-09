@@ -1,60 +1,24 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { useAuth } from '../hooks/useAuth'
 import { useCards } from '../hooks/useCards'
 import { usePurchases } from '../hooks/usePurchases'
+import { useSubscriptions } from '../hooks/useSubscriptions'
 import { MonthNavigator } from '../components/MonthNavigator'
 import { PurchaseForm } from '../components/PurchaseForm'
+import { DeleteConfirmModal } from '../components/DeleteConfirmModal'
+import { LoadingScreen } from '../components/LoadingScreen'
+import { ErrorState } from '../components/ErrorState'
 import { calculateInstallments, formatCurrency, getCurrentMonthYear } from '../utils/installments'
+import { getSubscriptionsForMonth } from '../utils/subscriptions'
 import '../styles/invoice.css'
-
-function DeleteConfirmModal({ purchase, onClose, onConfirm }) {
-  const [loading, setLoading] = useState(false)
-
-  const handleConfirm = async () => {
-    setLoading(true)
-    await onConfirm()
-    setLoading(false)
-  }
-
-  return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="delete-confirm">
-          <div className="delete-confirm-icon">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-              <line x1="12" y1="9" x2="12" y2="13" />
-              <line x1="12" y1="17" x2="12.01" y2="17" />
-            </svg>
-          </div>
-          <h3>Excluir compra?</h3>
-          <p>
-            Tem certeza que deseja excluir <strong>{purchase?.description}</strong>?
-            <br />
-            Todas as parcelas serão removidas.
-          </p>
-          <div className="delete-confirm-actions">
-            <button className="btn-secondary" onClick={onClose} disabled={loading}>
-              Cancelar
-            </button>
-            <button className="btn-danger" onClick={handleConfirm} disabled={loading}>
-              {loading ? 'Excluindo...' : 'Excluir'}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
 
 export function Invoice() {
   const { cardId } = useParams()
   const navigate = useNavigate()
-  const { user, signOut } = useAuth()
-  const { cards, loading: loadingCards, fetchCards } = useCards()
-  const { purchases, loading: loadingPurchases, fetchPurchasesByCard, createPurchase, updatePurchase, deletePurchase } = usePurchases()
+  const { cards, loading: loadingCards, error: errorCards, fetchCards } = useCards()
+  const { purchases, loading: loadingPurchases, error: errorPurchases, fetchPurchasesByCard, createPurchase, updatePurchase, deletePurchase } = usePurchases()
+  const { subscriptions, loading: loadingSubscriptions, error: errorSubscriptions, fetchSubscriptionsByCard } = useSubscriptions()
 
   const [currentMonth, setCurrentMonth] = useState(getCurrentMonthYear().month)
   const [currentYear, setCurrentYear] = useState(getCurrentMonthYear().year)
@@ -71,8 +35,9 @@ export function Invoice() {
   useEffect(() => {
     if (cardId) {
       fetchPurchasesByCard(cardId)
+      fetchSubscriptionsByCard(cardId)
     }
-  }, [cardId, fetchPurchasesByCard])
+  }, [cardId, fetchPurchasesByCard, fetchSubscriptionsByCard])
 
   const invoiceItems = useMemo(() => {
     if (!card) return []
@@ -98,9 +63,21 @@ export function Invoice() {
     return items.sort((a, b) => new Date(b.purchase_date) - new Date(a.purchase_date))
   }, [purchases, card, currentMonth, currentYear])
 
-  const totalAmount = useMemo(() => {
+  const monthlySubscriptions = useMemo(() => {
+    return getSubscriptionsForMonth(subscriptions, currentMonth, currentYear)
+  }, [subscriptions, currentMonth, currentYear])
+
+  const totalPurchases = useMemo(() => {
     return invoiceItems.reduce((sum, item) => sum + item.installmentAmount, 0)
   }, [invoiceItems])
+
+  const totalSubscriptions = useMemo(() => {
+    return monthlySubscriptions.reduce((sum, sub) => sum + Number(sub.amount), 0)
+  }, [monthlySubscriptions])
+
+  const totalAmount = useMemo(() => {
+    return totalPurchases + totalSubscriptions
+  }, [totalPurchases, totalSubscriptions])
 
   const handlePrevMonth = () => {
     if (currentMonth === 1) {
@@ -152,40 +129,62 @@ export function Invoice() {
     return result
   }
 
-  const handleLogout = async () => {
-    await signOut()
+  if (loadingCards) {
+    return <LoadingScreen message="Carregando fatura..." />
   }
 
-  if (loadingCards) {
-    return <div className="invoice-page"><div className="loading">Carregando...</div></div>
+  if (errorCards || errorPurchases || errorSubscriptions) {
+    return (
+      <div className="invoice-page-content">
+        <main className="invoice-main">
+          <ErrorState
+            error={errorCards || errorPurchases || errorSubscriptions}
+            onRetry={() => {
+              fetchCards()
+              if (cardId) {
+                fetchPurchasesByCard(cardId)
+                fetchSubscriptionsByCard(cardId)
+              }
+            }}
+          />
+        </main>
+      </div>
+    )
   }
 
   if (!card) {
-    return <div className="invoice-page"><div className="loading">Cartão não encontrado</div></div>
+    return (
+      <div className="invoice-page-content">
+        <main className="invoice-main">
+          <ErrorState
+            error="Cartão não encontrado."
+            onRetry={() => navigate('/cards')}
+          />
+        </main>
+      </div>
+    )
   }
 
   return (
-    <div className="invoice-page">
-      <header className="invoice-header" style={{ borderLeftColor: card.color }}>
-        <div className="invoice-header-left">
+    <div className="invoice-page-content">
+      <header className="page-header" style={{ borderLeftColor: card.color, borderLeft: `4px solid ${card.color}` }}>
+        <div className="page-header-left">
           <button className="btn-back" onClick={() => navigate('/cards')}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="15 18 9 12 15 6" />
             </svg>
             Voltar
           </button>
-          <h1>{card.name}</h1>
-          <p className="card-info">
-            Fechamento: dia {card.closing_day} | Vencimento: dia {card.due_day}
-          </p>
+          <div>
+            <h1>{card.name}</h1>
+            <p className="page-subtitle">
+              Fechamento: dia {card.closing_day} | Vencimento: dia {card.due_day}
+            </p>
+          </div>
         </div>
-        <div className="invoice-header-right">
-          <span className="user-email">{user?.email}</span>
+        <div className="page-header-right">
           <button className="btn-primary" onClick={handleAddPurchase}>
             + Nova Compra
-          </button>
-          <button className="btn-secondary" onClick={handleLogout}>
-            Sair
           </button>
         </div>
       </header>
@@ -206,14 +205,47 @@ export function Invoice() {
             <span className="summary-value">{formatCurrency(totalAmount)}</span>
           </div>
           <div className="summary-card">
-            <span className="summary-label">Compras no mês</span>
-            <span className="summary-value">{invoiceItems.length}</span>
+            <span className="summary-label">Compras</span>
+            <span className="summary-value">{formatCurrency(totalPurchases)}</span>
+          </div>
+          <div className="summary-card">
+            <span className="summary-label">Mensalidades</span>
+            <span className="summary-value">{formatCurrency(totalSubscriptions)}</span>
           </div>
         </div>
 
-        {loadingPurchases ? (
-          <div className="loading-state">Carregando compras...</div>
-        ) : invoiceItems.length === 0 ? (
+        {monthlySubscriptions.length > 0 && (
+          <div className="subscriptions-section">
+            <h3 className="section-title">Mensalidades ({monthlySubscriptions.length})</h3>
+            <div className="purchases-list">
+              {monthlySubscriptions.map(sub => (
+                <div key={sub.id} className="purchase-item subscription-item">
+                  <div className="purchase-info">
+                    <div className="purchase-main">
+                      <h4 className="purchase-description">{sub.description}</h4>
+                      <span className="purchase-category">Mensalidade</span>
+                    </div>
+                    <div className="purchase-meta">
+                      <span className="purchase-date">
+                        Cobrança: dia {sub.billing_day}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="purchase-amount-actions">
+                    <span className="purchase-amount">{formatCurrency(sub.amount)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {loadingPurchases || loadingSubscriptions ? (
+          <div className="loading-state">
+            <div className="loading-spinner-small primary" style={{ width: '24px', height: '24px', borderWidth: '3px', margin: '0 auto 12px' }} />
+            <p>Carregando lançamentos...</p>
+          </div>
+        ) : invoiceItems.length === 0 && monthlySubscriptions.length === 0 ? (
           <div className="empty-invoice">
             <div className="empty-icon">
               <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#57449a" strokeWidth="1.5">
@@ -228,51 +260,58 @@ export function Invoice() {
             </button>
           </div>
         ) : (
-          <div className="purchases-list">
-            {invoiceItems.map(item => (
-              <div key={item.id} className="purchase-item">
-                <div className="purchase-info">
-                  <div className="purchase-main">
-                    <h4 className="purchase-description">{item.description}</h4>
-                    {item.category && <span className="purchase-category">{item.category}</span>}
-                  </div>
-                  <div className="purchase-meta">
-                    <span className="purchase-date">
-                      {new Date(item.purchase_date).toLocaleDateString('pt-BR')}
-                    </span>
-                    <span className="purchase-installment">
-                      {item.installmentNumber}/{item.totalInstallments}
-                    </span>
-                  </div>
-                </div>
-                <div className="purchase-amount-actions">
-                  <span className="purchase-amount">{formatCurrency(item.installmentAmount)}</span>
-                  <div className="purchase-actions">
-                    <button
-                      className="card-action-btn edit"
-                      onClick={() => handleEditPurchase(item)}
-                      title="Editar"
-                    >
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                      </svg>
-                    </button>
-                    <button
-                      className="card-action-btn delete"
-                      onClick={() => handleDeleteClick(item)}
-                      title="Excluir"
-                    >
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polyline points="3 6 5 6 21 6" />
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                      </svg>
-                    </button>
-                  </div>
+          <>
+            {invoiceItems.length > 0 && (
+              <div className="purchases-section">
+                <h3 className="section-title">Compras ({invoiceItems.length})</h3>
+                <div className="purchases-list">
+                  {invoiceItems.map(item => (
+                    <div key={item.id} className="purchase-item">
+                      <div className="purchase-info">
+                        <div className="purchase-main">
+                          <h4 className="purchase-description">{item.description}</h4>
+                          {item.category && <span className="purchase-category">{item.category}</span>}
+                        </div>
+                        <div className="purchase-meta">
+                          <span className="purchase-date">
+                            {new Date(item.purchase_date).toLocaleDateString('pt-BR')}
+                          </span>
+                          <span className="purchase-installment">
+                            {item.installmentNumber}/{item.totalInstallments}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="purchase-amount-actions">
+                        <span className="purchase-amount">{formatCurrency(item.installmentAmount)}</span>
+                        <div className="purchase-actions">
+                          <button
+                            className="card-action-btn edit"
+                            onClick={() => handleEditPurchase(item)}
+                            title="Editar"
+                          >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                          </button>
+                          <button
+                            className="card-action-btn delete"
+                            onClick={() => handleDeleteClick(item)}
+                            title="Excluir"
+                          >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <polyline points="3 6 5 6 21 6" />
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </main>
 
@@ -288,7 +327,9 @@ export function Invoice() {
 
       {deletingPurchase && (
         <DeleteConfirmModal
-          purchase={deletingPurchase}
+          title="Excluir compra?"
+          itemName={deletingPurchase.description}
+          warningText="Todas as parcelas serão removidas."
           onClose={() => setDeletingPurchase(null)}
           onConfirm={handleConfirmDelete}
         />

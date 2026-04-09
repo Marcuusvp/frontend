@@ -5,21 +5,8 @@
   background: #f8f9fa;
 }
 
-/* Header */
-.invoice-header {
-  background: white;
-  padding: 24px 32px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-left: 4px solid #57449a;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.invoice-header-left {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.invoice-page-content {
+  min-height: 100%;
 }
 
 .btn-back {
@@ -280,19 +267,66 @@
   font-size: 16px;
 }
 
+/* Subscriptions Section */
+.subscriptions-section {
+  margin-bottom: 32px;
+}
+
+.section-title {
+  color: #2f363f;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #d9d7ef;
+}
+
+.subscription-item {
+  border-left: 3px solid #2ecc71;
+}
+
+.subscription-item .purchase-category {
+  background: #e8f8f0;
+  color: #27ae60;
+}
+
+/* Purchases Section */
+.purchases-section {
+  margin-top: 32px;
+}
+
+/* Form help text */
+.form-help {
+  color: #666;
+  font-size: 12px;
+  display: block;
+  margin-top: 4px;
+}
+
+/* Checkbox group */
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #2f363f;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
-  .invoice-header {
-    flex-direction: column;
-    gap: 16px;
-    text-align: center;
-  }
-
-  .invoice-header-right {
-    flex-direction: column;
-    width: 100%;
-  }
-
   .invoice-main {
     padding: 16px;
   }

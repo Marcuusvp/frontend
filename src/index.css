@@ -107,3 +107,67 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* Error Boundary */
+.error-boundary {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+}
+
+.error-boundary-content {
+  text-align: center;
+  padding: 48px 32px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  max-width: 400px;
+  width: 90%;
+}
+
+.error-boundary-icon {
+  margin-bottom: 16px;
+}
+
+.error-boundary h2 {
+  color: #2f363f;
+  margin: 0 0 12px;
+}
+
+.error-boundary p {
+  color: #666;
+  margin: 0 0 24px;
+}
+
+.error-boundary button {
+  display: block;
+  width: 100%;
+  margin-bottom: 0;
+}
+
+/* Error State (inline in pages) */
+.error-state {
+  text-align: center;
+  padding: 64px 32px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.error-state-icon {
+  margin-bottom: 16px;
+}
+
+.error-state h3 {
+  color: #2f363f;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.error-state p {
+  color: #666;
+  margin: 0 0 24px;
+}
