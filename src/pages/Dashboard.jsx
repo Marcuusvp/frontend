@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { useDashboard } from '../hooks/useDashboard'
 import { LoadingScreen } from '../components/LoadingScreen'
 import { ErrorState } from '../components/ErrorState'
-import { formatCurrency } from '../utils/installments'
+import { formatCurrency, formatMonth as formatMonthName } from '../utils/installments'
 import { getTransactionTypeColor } from '../utils/balance'
 import '../styles/dashboard.css'
 
@@ -78,7 +78,7 @@ export function Dashboard() {
                 </svg>
               </div>
               <div className="summary-content">
-                <span className="summary-label">Total de Faturas</span>
+                <span className="summary-label">Faturas em Aberto</span>
                 <span className="summary-value">{formatCurrency(totalInvoices)}</span>
               </div>
             </div>
@@ -98,7 +98,7 @@ export function Dashboard() {
                 )}
               </div>
               <div className="summary-content">
-                <span className="summary-label">Resultado do Mês</span>
+                <span className="summary-label">Resultado Previsto</span>
                 <span className="summary-value">
                   {monthResult >= 0 ? '+' : ''}{formatCurrency(monthResult)}
                 </span>
@@ -130,10 +130,10 @@ export function Dashboard() {
             </div>
           ) : (
             <div className="cards-grid">
-              {cardInvoices.map(({ card, total, purchases, subscriptions }) => (
+              {cardInvoices.map(({ card, total, purchases, subscriptions, invoiceMonth, invoiceYear, isPaid }) => (
                 <div
                   key={card.id}
-                  className="card-invoice-item"
+                  className={`card-invoice-item ${isPaid ? 'paid' : ''}`}
                   onClick={() => handleCardClick(card.id)}
                   style={{ borderLeftColor: card.color }}
                 >
@@ -141,9 +141,13 @@ export function Dashboard() {
                     <h3 style={{ color: card.color }}>{card.name}</h3>
                     <span className="due-date">Venc. dia {card.due_day}</span>
                   </div>
-                  <div className="card-invoice-amount">
-                    {formatCurrency(total)}
+                  <div className="card-invoice-reference">
+                    {formatMonthName(invoiceMonth)} {invoiceYear}
                   </div>
+                  <div className={`card-invoice-amount ${isPaid ? 'amount-paid' : ''}`}>
+                    {isPaid ? formatCurrency(0) : formatCurrency(total)}
+                  </div>
+                  {isPaid && <span className="paid-badge-dashboard">Paga</span>}
                   <div className="card-invoice-details">
                     {purchases.length > 0 && (
                       <span>{purchases.length} compra{purchases.length > 1 ? 's' : ''}</span>

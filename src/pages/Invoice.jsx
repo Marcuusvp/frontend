@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { useCards } from '../hooks/useCards'
 import { usePurchases } from '../hooks/usePurchases'
 import { useSubscriptions } from '../hooks/useSubscriptions'
+import { useInvoicePayments } from '../hooks/useInvoicePayments'
 import { MonthNavigator } from '../components/MonthNavigator'
 import { PurchaseForm } from '../components/PurchaseForm'
 import { DeleteConfirmModal } from '../components/DeleteConfirmModal'
@@ -19,6 +20,7 @@ export function Invoice() {
   const { cards, loading: loadingCards, error: errorCards, fetchCards } = useCards()
   const { purchases, loading: loadingPurchases, error: errorPurchases, fetchPurchasesByCard, createPurchase, updatePurchase, deletePurchase } = usePurchases()
   const { subscriptions, loading: loadingSubscriptions, error: errorSubscriptions, fetchSubscriptionsByCard } = useSubscriptions()
+  const { payment, loading: loadingPayment, fetchPayment, markAsPaid, unmarkAsPaid } = useInvoicePayments()
 
   const [currentMonth, setCurrentMonth] = useState(getCurrentMonthYear().month)
   const [currentYear, setCurrentYear] = useState(getCurrentMonthYear().year)
@@ -38,6 +40,13 @@ export function Invoice() {
       fetchSubscriptionsByCard(cardId)
     }
   }, [cardId, fetchPurchasesByCard, fetchSubscriptionsByCard])
+
+  // Buscar status de pagamento ao carregar ou mudar de mês
+  useEffect(() => {
+    if (cardId) {
+      fetchPayment(cardId, currentMonth, currentYear)
+    }
+  }, [cardId, currentMonth, currentYear, fetchPayment])
 
   const invoiceItems = useMemo(() => {
     if (!card) return []
@@ -112,10 +121,44 @@ export function Invoice() {
   }
 
   const handleSubmitPurchase = async (formData) => {
+    let result
     if (editingPurchase) {
-      return await updatePurchase(editingPurchase.id, formData)
+      result = await updatePurchase(editingPurchase.id, formData)
     } else {
-      return await createPurchase(formData)
+      result = await createPurchase(formData)
+    }
+
+    // Auto-reabrir fatura se estava paga e antes do fechamento
+    if (!result.error && payment && card) {
+      const today = new Date().getDate()
+      const daysInCurrentMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate()
+      const effectiveClosingDay = Math.min(card.closing_day, daysInCurrentMonth)
+
+      if (today <= effectiveClosingDay) {
+        await unmarkAsPaid(cardId, currentMonth, currentYear)
+        toast.info('Fatura reaberta — nova compra adicionada.')
+      }
+    }
+
+    return result
+  }
+
+  const handleMarkAsPaid = async () => {
+    if (!card || totalAmount <= 0) return
+    const result = await markAsPaid(cardId, card.name, currentMonth, currentYear, totalAmount)
+    if (result.error) {
+      toast.error('Erro ao marcar fatura como paga.')
+    } else {
+      toast.success('Fatura marcada como paga!')
+    }
+  }
+
+  const handleUnmarkAsPaid = async () => {
+    const result = await unmarkAsPaid(cardId, currentMonth, currentYear)
+    if (result.error) {
+      toast.error('Erro ao desfazer pagamento.')
+    } else {
+      toast.success('Pagamento desfeito.')
     }
   }
 
@@ -183,6 +226,23 @@ export function Invoice() {
           </div>
         </div>
         <div className="page-header-right">
+          {totalAmount > 0 && !payment && (
+            <button className="btn-paid" onClick={handleMarkAsPaid} disabled={loadingPayment}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Marcar como Paga
+            </button>
+          )}
+          {payment && (
+            <button className="btn-unpaid" onClick={handleUnmarkAsPaid} disabled={loadingPayment}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+              Desfazer Pagamento
+            </button>
+          )}
           <button className="btn-primary" onClick={handleAddPurchase}>
             + Nova Compra
           </button>
@@ -199,10 +259,13 @@ export function Invoice() {
           />
         </div>
 
-        <div className="invoice-summary">
+        <div className={`invoice-summary ${payment ? 'invoice-paid' : ''}`}>
           <div className="summary-card">
-            <span className="summary-label">Total da Fatura</span>
-            <span className="summary-value">{formatCurrency(totalAmount)}</span>
+            <div className="summary-card-header">
+              <span className="summary-label">Total da Fatura</span>
+              {payment && <span className="paid-badge">Paga</span>}
+            </div>
+            <span className="summary-value">{payment ? formatCurrency(0) : formatCurrency(totalAmount)}</span>
           </div>
           <div className="summary-card">
             <span className="summary-label">Compras</span>

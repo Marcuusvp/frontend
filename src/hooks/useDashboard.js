@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from './useAuth'
-import { calculateInstallments } from '../utils/installments'
+import { calculateInstallments, getRelevantInvoiceMonth } from '../utils/installments'
 import { getSubscriptionsForMonth } from '../utils/subscriptions'
 
 export function useDashboard() {
@@ -9,6 +9,7 @@ export function useDashboard() {
   const [purchases, setPurchases] = useState([])
   const [subscriptions, setSubscriptions] = useState([])
   const [transactions, setTransactions] = useState([])
+  const [invoicePayments, setInvoicePayments] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const { user } = useAuth()
@@ -20,7 +21,6 @@ export function useDashboard() {
     setError(null)
 
     try {
-      // Buscar cartões
       const { data: cardsData, error: cardsError } = await supabase
         .from('cards')
         .select('*')
@@ -28,26 +28,23 @@ export function useDashboard() {
 
       if (cardsError) throw cardsError
 
-      // Buscar compras
       const { data: purchasesData, error: purchasesError } = await supabase
         .from('purchases')
         .select('*')
 
       if (purchasesError) throw purchasesError
 
-      // Buscar mensalidades
       const { data: subscriptionsData, error: subscriptionsError } = await supabase
         .from('subscriptions')
         .select('*')
 
       if (subscriptionsError) throw subscriptionsError
 
-      // Buscar transações de saldo (últimas 5)
+      // Buscar TODAS as transações (sem limit) para saldo correto
       const { data: transactionsData, error: transactionsError } = await supabase
         .from('balance_transactions')
         .select('*')
         .order('date', { ascending: false })
-        .limit(5)
 
       if (transactionsError) throw transactionsError
 
@@ -55,6 +52,17 @@ export function useDashboard() {
       setPurchases(purchasesData || [])
       setSubscriptions(subscriptionsData || [])
       setTransactions(transactionsData || [])
+
+      // Buscar pagamentos de fatura se houver cartões
+      if (cardsData && cardsData.length > 0) {
+        const { data: paymentsData, error: paymentsError } = await supabase
+          .from('invoice_payments')
+          .select('*')
+          .in('card_id', cardsData.map(c => c.id))
+
+        if (paymentsError) throw paymentsError
+        setInvoicePayments(paymentsData || [])
+      }
     } catch (err) {
       setError(err.message)
     } finally {
@@ -73,12 +81,11 @@ export function useDashboard() {
     }, 0)
   }, [transactions])
 
-  // Calcula fatura de um cartão específico para um mês/ano
+  // Calcula fatura de um cartão para um mês/ano
   const calculateCardInvoice = useCallback((cardId, month, year) => {
     const card = cards.find(c => c.id === cardId)
     if (!card) return { total: 0, purchases: [], subscriptions: [] }
 
-    // Compras do cartão
     const cardPurchases = purchases.filter(p => p.card_id === cardId)
     const purchaseItems = []
 
@@ -97,7 +104,6 @@ export function useDashboard() {
       }
     })
 
-    // Mensalidades do cartão
     const cardSubscriptions = subscriptions.filter(s => s.card_id === cardId)
     const activeSubscriptions = getSubscriptionsForMonth(cardSubscriptions, month, year)
 
@@ -111,21 +117,32 @@ export function useDashboard() {
     }
   }, [cards, purchases, subscriptions])
 
-  // Retorna dados consolidados para um mês específico
-  const getMonthData = useCallback((month, year) => {
-    // Faturas por cartão
+  // Dados consolidados com mês relevante por cartão
+  const dashboardData = useMemo(() => {
+    // Para cada cartão, determina o mês relevante e calcula a fatura
     const cardInvoices = cards.map(card => {
+      const { month, year } = getRelevantInvoiceMonth(card)
       const invoice = calculateCardInvoice(card.id, month, year)
+
+      // Verifica se a fatura está paga
+      const isPaid = invoicePayments.some(
+        p => p.card_id === card.id && p.month === month && p.year === year
+      )
+
       return {
         card,
         ...invoice,
+        invoiceMonth: month,
+        invoiceYear: year,
+        isPaid,
       }
     })
 
-    // Total de todas as faturas
-    const totalInvoices = cardInvoices.reduce((sum, item) => sum + item.total, 0)
+    // Total apenas de faturas em aberto (não pagas)
+    const totalInvoices = cardInvoices
+      .filter(item => !item.isPaid)
+      .reduce((sum, item) => sum + item.total, 0)
 
-    // Resultado do mês (saldo - faturas)
     const monthResult = currentBalance - totalInvoices
 
     return {
@@ -133,34 +150,15 @@ export function useDashboard() {
       totalInvoices,
       monthResult,
     }
-  }, [cards, currentBalance, calculateCardInvoice])
-
-  // Estado para mês/ano atual do dashboard
-  const [currentMonth, setCurrentMonth] = useState(() => new Date().getMonth() + 1)
-  const [currentYear, setCurrentYear] = useState(() => new Date().getFullYear())
-
-  // Dados do mês atual
-  const currentMonthData = useMemo(() => {
-    return getMonthData(currentMonth, currentYear)
-  }, [getMonthData, currentMonth, currentYear])
-
-  // Função para mudar o mês
-  const changeMonth = useCallback((month, year) => {
-    setCurrentMonth(month)
-    setCurrentYear(year)
-  }, [])
+  }, [cards, calculateCardInvoice, invoicePayments, currentBalance])
 
   return {
     cards,
     transactions,
     currentBalance,
-    currentMonth,
-    currentYear,
     loading,
     error,
     fetchDashboardData,
-    getMonthData,
-    changeMonth,
-    ...currentMonthData,
+    ...dashboardData,
   }
 }

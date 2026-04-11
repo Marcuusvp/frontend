@@ -105,3 +105,33 @@ export function getCurrentMonthYear() {
     year: now.getFullYear(),
   }
 }
+
+/**
+ * Determina o mês/ano da fatura relevante para um cartão
+ * Se hoje passou do dia de fechamento, retorna o mês seguinte (fatura que está acumulando)
+ * Caso contrário, retorna o mês atual (fatura aberta)
+ * @param {Object} card - Dados do cartão com closing_day
+ * @returns {Object} { month, year }
+ */
+export function getRelevantInvoiceMonth(card) {
+  const now = new Date()
+  const today = now.getDate()
+
+  // Ajusta o closing_day para o mês atual (meses com menos dias)
+  const daysInCurrentMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
+  const effectiveClosingDay = Math.min(card.closing_day, daysInCurrentMonth)
+
+  if (today > effectiveClosingDay) {
+    // Após fechamento → mostra fatura do mês seguinte
+    let month = now.getMonth() + 2 // +1 (1-indexed) +1 (next month)
+    let year = now.getFullYear()
+    if (month > 12) {
+      month = 1
+      year++
+    }
+    return { month, year }
+  }
+
+  // Antes do fechamento → mostra fatura do mês atual
+  return { month: now.getMonth() + 1, year: now.getFullYear() }
+}
