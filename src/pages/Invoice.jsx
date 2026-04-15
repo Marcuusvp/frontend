@@ -10,7 +10,7 @@ import { PurchaseForm } from '../components/PurchaseForm'
 import { DeleteConfirmModal } from '../components/DeleteConfirmModal'
 import { LoadingScreen } from '../components/LoadingScreen'
 import { ErrorState } from '../components/ErrorState'
-import { calculateInstallments, formatCurrency, getCurrentMonthYear } from '../utils/installments'
+import { calculateInstallments, formatCurrency, getCurrentMonthYear, getRelevantInvoiceMonth } from '../utils/installments'
 import { getSubscriptionsForMonth } from '../utils/subscriptions'
 import '../styles/invoice.css'
 
@@ -30,9 +30,21 @@ export function Invoice() {
 
   const card = useMemo(() => cards.find(c => c.id === cardId), [cards, cardId])
 
+  const [initialMonthSet, setInitialMonthSet] = useState(false)
+
   useEffect(() => {
     fetchCards()
   }, [fetchCards])
+
+  // Ao carregar o cartão, ajustar o mês para a fatura relevante (aberta)
+  useEffect(() => {
+    if (card && !initialMonthSet) {
+      const { month, year } = getRelevantInvoiceMonth(card)
+      setCurrentMonth(month)
+      setCurrentYear(year)
+      setInitialMonthSet(true)
+    }
+  }, [card, initialMonthSet])
 
   useEffect(() => {
     if (cardId) {
