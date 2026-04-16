@@ -31,7 +31,7 @@
   margin-bottom: 32px;
 }
 
-.balance-page .summary-card {
+.balance-page-content .summary-card {
   background: white;
   padding: 24px;
   border-radius: 12px;
@@ -57,12 +57,12 @@
   border-left: 4px solid #3498db;
 }
 
-.balance-page .summary-label {
+.balance-page-content .summary-label {
   color: #666;
   font-size: 14px;
 }
 
-.balance-page .summary-value {
+.balance-page-content .summary-value {
   color: #2f363f;
   font-size: 24px;
   font-weight: 700;
@@ -77,7 +77,7 @@
 }
 
 /* Transactions Section */
-.balance-page .transactions-section {
+.balance-page-content .transactions-section {
   background: white;
   padding: 24px;
   border-radius: 16px;
@@ -142,7 +142,7 @@
   flex-shrink: 0;
 }
 
-.balance-page .transaction-info {
+.balance-page-content .transaction-info {
   flex: 1;
 }
 
@@ -153,7 +153,7 @@
   margin-bottom: 4px;
 }
 
-.balance-page .transaction-description {
+.balance-page-content .transaction-description {
   color: #2f363f;
   font-size: 16px;
   font-weight: 600;
@@ -174,7 +174,7 @@
   gap: 16px;
 }
 
-.balance-page .transaction-date {
+.balance-page-content .transaction-date {
   color: #999;
   font-size: 13px;
 }
@@ -190,7 +190,7 @@
   gap: 16px;
 }
 
-.balance-page .transaction-amount {
+.balance-page-content .transaction-amount {
   font-size: 18px;
   font-weight: 700;
   min-width: 120px;
