@@ -68,7 +68,7 @@
   margin-bottom: 32px;
 }
 
-.summary-card {
+.invoice-page .summary-card {
   background: white;
   padding: 24px;
   border-radius: 12px;
@@ -78,18 +78,18 @@
   gap: 8px;
 }
 
-.summary-label {
+.invoice-page .summary-label {
   color: #666;
   font-size: 14px;
 }
 
-.summary-value {
+.invoice-page .summary-value {
   color: #2f363f;
   font-size: 28px;
   font-weight: 700;
 }
 
-.summary-card:first-child .summary-value {
+.invoice-page .summary-card:first-child .summary-value {
   color: #57449a;
 }
 
@@ -226,7 +226,7 @@
   margin-bottom: 32px;
 }
 
-.section-title {
+.invoice-page .section-title {
   color: #2f363f;
   font-size: 18px;
   font-weight: 600;
@@ -320,18 +320,18 @@
   border-radius: 12px;
 }
 
-.summary-card-header {
+.invoice-page .summary-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
 }
 
-.invoice-paid .summary-value {
+.invoice-page .invoice-paid .summary-value {
   color: #27ae60;
 }
 
-.invoice-paid .summary-card:first-child .summary-value {
+.invoice-page .invoice-paid .summary-card:first-child .summary-value {
   color: #27ae60;
 }
 
