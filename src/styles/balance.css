@@ -41,19 +41,19 @@
   gap: 8px;
 }
 
-.balance-page .summary-card.balance-total {
+.balance-page-content .summary-card.balance-total {
   border-left: 4px solid #57449a;
 }
 
-.balance-page .summary-card.income {
+.balance-page-content .summary-card.income {
   border-left: 4px solid #2ecc71;
 }
 
-.balance-page .summary-card.expense {
+.balance-page-content .summary-card.expense {
   border-left: 4px solid #e74c3c;
 }
 
-.balance-page .summary-card.total-balance {
+.balance-page-content .summary-card.total-balance {
   border-left: 4px solid #3498db;
 }
 
@@ -68,11 +68,11 @@
   font-weight: 700;
 }
 
-.balance-page .summary-value.positive {
+.balance-page-content .summary-value.positive {
   color: #2ecc71;
 }
 
-.balance-page .summary-value.negative {
+.balance-page-content .summary-value.negative {
   color: #e74c3c;
 }
 
@@ -84,7 +84,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-.balance-page .transactions-section .section-title {
+.balance-page-content .transactions-section .section-title {
   margin-top: 0;
   margin-bottom: 20px;
 }

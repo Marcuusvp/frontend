@@ -89,7 +89,7 @@
   font-weight: 700;
 }
 
-.invoice-page .summary-card:first-child .summary-value {
+.invoice-page-content .summary-card:first-child .summary-value {
   color: #57449a;
 }
 
