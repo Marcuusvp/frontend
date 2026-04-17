@@ -275,7 +275,7 @@ export function Invoice() {
           <div className="summary-card">
             <div className="summary-card-header">
               <span className="summary-label">Total da Fatura</span>
-              {payment && <span className="paid-badge">Paga</span>}
+              {payment && <span className="badge badge-success">Paga</span>}
             </div>
             <span className="summary-value">{payment ? formatCurrency(0) : formatCurrency(totalAmount)}</span>
           </div>
@@ -291,14 +291,14 @@ export function Invoice() {
 
         {monthlySubscriptions.length > 0 && (
           <div className="subscriptions-section">
-            <h3 className="section-title">Mensalidades ({monthlySubscriptions.length})</h3>
+            <h3 className="section-title underlined">Mensalidades ({monthlySubscriptions.length})</h3>
             <div className="purchases-list">
               {monthlySubscriptions.map(sub => (
                 <div key={sub.id} className="purchase-item subscription-item">
                   <div className="purchase-info">
                     <div className="purchase-main">
                       <h4 className="purchase-description">{sub.description}</h4>
-                      <span className="purchase-category">Mensalidade</span>
+                      <span className="category-badge">Mensalidade</span>
                     </div>
                     <div className="purchase-meta">
                       <span className="purchase-date">
@@ -321,15 +321,15 @@ export function Invoice() {
             <p>Carregando lançamentos...</p>
           </div>
         ) : invoiceItems.length === 0 && monthlySubscriptions.length === 0 ? (
-          <div className="empty-invoice">
-            <div className="empty-icon">
+          <div className="empty-state">
+            <div className="empty-state-icon">
               <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#57449a" strokeWidth="1.5">
                 <rect x="2" y="5" width="20" height="14" rx="2" />
                 <line x1="2" y1="10" x2="22" y2="10" />
               </svg>
             </div>
-            <h3>Nenhuma compra neste mês</h3>
-            <p>Adicione uma nova compra para este cartão.</p>
+            <h3 className="empty-state-title">Nenhuma compra neste mês</h3>
+            <p className="empty-state-description">Adicione uma nova compra para este cartão.</p>
             <button className="auth-button" onClick={handleAddPurchase}>
               Registrar Compra
             </button>
@@ -338,14 +338,14 @@ export function Invoice() {
           <>
             {invoiceItems.length > 0 && (
               <div className="purchases-section">
-                <h3 className="section-title">Compras ({invoiceItems.length})</h3>
+                <h3 className="section-title underlined">Compras ({invoiceItems.length})</h3>
                 <div className="purchases-list">
                   {invoiceItems.map(item => (
                     <div key={item.id} className="purchase-item">
                       <div className="purchase-info">
                         <div className="purchase-main">
                           <h4 className="purchase-description">{item.description}</h4>
-                          {item.category && <span className="purchase-category">{item.category}</span>}
+                          {item.category && <span className="category-badge">{item.category}</span>}
                         </div>
                         <div className="purchase-meta">
                           <span className="purchase-date">

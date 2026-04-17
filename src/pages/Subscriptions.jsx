@@ -13,12 +13,6 @@ function SubscriptionItem({ subscription, card, onEdit, onDelete, onToggleActive
   const status = getSubscriptionStatus(subscription)
   const statusLabel = getSubscriptionStatusLabel(status)
 
-  const statusColors = {
-    active: '#2ecc71',
-    paused: '#f39c12',
-    ended: '#95a5a6',
-  }
-
   return (
     <div className="card-item" style={{ opacity: subscription.active ? 1 : 0.7 }}>
       <div
@@ -28,17 +22,7 @@ function SubscriptionItem({ subscription, card, onEdit, onDelete, onToggleActive
       <div className="card-content">
         <div className="card-header">
           <h3 className="card-name">{subscription.description}</h3>
-          <span
-            className="subscription-status"
-            style={{
-              backgroundColor: `${statusColors[status]}20`,
-              color: statusColors[status],
-              padding: '2px 8px',
-              borderRadius: '4px',
-              fontSize: '0.75rem',
-              fontWeight: 500,
-            }}
-          >
+          <span className={`subscription-status ${status}`}>
             {statusLabel}
           </span>
         </div>
@@ -55,7 +39,7 @@ function SubscriptionItem({ subscription, card, onEdit, onDelete, onToggleActive
             </span>
           )}
         </div>
-        <div className="card-dates" style={{ marginTop: '4px', fontSize: '0.8rem', color: '#666' }}>
+        <div className="card-dates">
           Início: {new Date(subscription.start_date).toLocaleDateString('pt-BR')}
           {subscription.end_date && (
             <span> | Término: {new Date(subscription.end_date).toLocaleDateString('pt-BR')}</span>
@@ -112,8 +96,8 @@ function EmptySubscriptions({ onAction }) {
           <path d="M12 2v20M2 12h20" strokeDasharray="4 4" />
         </svg>
       </div>
-      <h3>Nenhuma mensalidade cadastrada</h3>
-      <p>Cadastre suas assinaturas e mensalidades para acompanhá-las automaticamente nas faturas.</p>
+      <h3 className="empty-state-title">Nenhuma mensalidade cadastrada</h3>
+      <p className="empty-state-description">Cadastre suas assinaturas e mensalidades para acompanhá-las automaticamente nas faturas.</p>
       <button className="auth-button" onClick={onAction}>
         Adicionar mensalidade
       </button>

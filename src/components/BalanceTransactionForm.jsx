@@ -84,13 +84,8 @@ export function BalanceTransactionForm({ transaction, onClose, onSubmit }) {
             <div className="transaction-type-selector">
               <button
                 type="button"
-                className={`type-btn ${formData.type === 'income' ? 'active' : ''}`}
+                className={`type-btn ${formData.type === 'income' ? 'active-income' : ''}`}
                 onClick={() => setFormData(prev => ({ ...prev, type: 'income' }))}
-                style={{
-                  backgroundColor: formData.type === 'income' ? '#2ecc7120' : 'transparent',
-                  borderColor: formData.type === 'income' ? '#2ecc71' : '#d9d7ef',
-                  color: formData.type === 'income' ? '#2ecc71' : '#666'
-                }}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
@@ -100,13 +95,8 @@ export function BalanceTransactionForm({ transaction, onClose, onSubmit }) {
               </button>
               <button
                 type="button"
-                className={`type-btn ${formData.type === 'expense' ? 'active' : ''}`}
+                className={`type-btn ${formData.type === 'expense' ? 'active-expense' : ''}`}
                 onClick={() => setFormData(prev => ({ ...prev, type: 'expense' }))}
-                style={{
-                  backgroundColor: formData.type === 'expense' ? '#e74c3c20' : 'transparent',
-                  borderColor: formData.type === 'expense' ? '#e74c3c' : '#d9d7ef',
-                  color: formData.type === 'expense' ? '#e74c3c' : '#666'
-                }}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="23 18 13.5 8.5 8.5 13.5 1 6" />

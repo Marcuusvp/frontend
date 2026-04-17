@@ -116,14 +116,14 @@ export function Dashboard() {
           </div>
 
           {cards.length === 0 ? (
-            <div className="empty-cards">
-              <div className="empty-icon">
+            <div className="empty-state">
+              <div className="empty-state-icon">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#57449a" strokeWidth="1.5">
                   <rect x="3" y="4" width="18" height="16" rx="2" />
                   <line x1="3" y1="10" x2="21" y2="10" />
                 </svg>
               </div>
-              <p>Nenhum cartão cadastrado</p>
+              <p className="empty-state-description">Nenhum cartão cadastrado</p>
               <button className="btn-primary" onClick={() => navigate('/cards')}>
                 Adicionar primeiro cartão
               </button>
@@ -147,7 +147,7 @@ export function Dashboard() {
                   <div className={`card-invoice-amount ${isPaid ? 'amount-paid' : ''}`}>
                     {isPaid ? formatCurrency(0) : formatCurrency(total)}
                   </div>
-                  {isPaid && <span className="paid-badge-dashboard">Paga</span>}
+                  {isPaid && <span className="badge badge-success">Paga</span>}
                   <div className="card-invoice-details">
                     {purchases.length > 0 && (
                       <span>{purchases.length} compra{purchases.length > 1 ? 's' : ''}</span>
@@ -174,8 +174,8 @@ export function Dashboard() {
           </div>
 
           {transactions.length === 0 ? (
-            <div className="empty-transactions">
-              <p>Nenhuma transação registrada</p>
+            <div className="empty-state">
+              <p className="empty-state-description">Nenhuma transação registrada</p>
               <button className="btn-primary" onClick={() => navigate('/balance')}>
                 Adicionar transação
               </button>

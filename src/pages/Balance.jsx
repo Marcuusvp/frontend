@@ -181,8 +181,8 @@ export function Balance() {
           <h3 className="section-title">Transações de {formatMonth(currentMonth)}</h3>
 
           {monthlyTransactions.length === 0 ? (
-            <div className="empty-balance">
-              <div className="empty-icon">
+            <div className="empty-state">
+              <div className="empty-state-icon">
                 <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#57449a" strokeWidth="1.5">
                   <rect x="2" y="5" width="20" height="14" rx="2" />
                   <line x1="2" y1="10" x2="22" y2="10" />
@@ -190,8 +190,8 @@ export function Balance() {
                   <line x1="12" y1="15" x2="12.01" y2="15" />
                 </svg>
               </div>
-              <h3>Nenhuma transação neste mês</h3>
-              <p>Adicione uma nova transação para começar a controlar suas finanças.</p>
+              <h3 className="empty-state-title">Nenhuma transação neste mês</h3>
+              <p className="empty-state-description">Adicione uma nova transação para começar a controlar suas finanças.</p>
               <button className="auth-button" onClick={handleAddTransaction}>
                 Registrar Transação
               </button>
@@ -227,7 +227,7 @@ export function Balance() {
                     <div className="transaction-main">
                       <h4 className="transaction-description">{transaction.description}</h4>
                       {transaction.category && (
-                        <span className="transaction-category">{transaction.category}</span>
+                        <span className="category-badge">{transaction.category}</span>
                       )}
                     </div>
                     <div className="transaction-meta">
