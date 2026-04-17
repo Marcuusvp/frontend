@@ -15,10 +15,6 @@ function SubscriptionItem({ subscription, card, onEdit, onDelete, onToggleActive
 
   return (
     <div className="card-item" style={{ opacity: subscription.active ? 1 : 0.7 }}>
-      <div
-        className="card-color-indicator"
-        style={{ backgroundColor: card?.color || '#57449a' }}
-      />
       <div className="card-content">
         <div className="card-header">
           <h3 className="card-name">{subscription.description}</h3>
