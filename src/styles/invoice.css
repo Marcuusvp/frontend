@@ -170,10 +170,6 @@
   margin-bottom: var(--space-3xl);
 }
 
-.subscription-item {
-  border-left: 3px solid var(--color-success);
-}
-
 .subscription-item .category-badge {
   background: var(--color-success-light);
   color: var(--color-success-dark);
