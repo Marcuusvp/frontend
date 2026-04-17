@@ -48,13 +48,6 @@
 }
 
 /* Transactions Section */
-.balance-page-content .transactions-section {
-  background: var(--color-surface);
-  padding: var(--space-2xl);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
-}
-
 .balance-page-content .transactions-section .section-title {
   margin-top: 0;
   margin-bottom: var(--space-xl);
@@ -71,14 +64,15 @@
   display: flex;
   align-items: center;
   gap: var(--space-lg);
-  padding: var(--space-lg);
+  padding: var(--space-xl) var(--space-2xl);
   border-radius: var(--radius-lg);
-  background: var(--color-background);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
   transition: var(--transition-fast);
 }
 
 .transaction-item:hover {
-  background: var(--color-surface-hover);
+  box-shadow: var(--shadow-md);
 }
 
 .transaction-icon {
