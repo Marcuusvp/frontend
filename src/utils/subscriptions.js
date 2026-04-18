@@ -1,30 +1,22 @@
+import { parseSupabaseDate } from './date'
+
 /**
  * Filtra as assinaturas ativas para um determinado mês/ano
- * @param {Array} subscriptions - Lista de assinaturas
- * @param {number} month - Mês (1-12)
- * @param {number} year - Ano
- * @returns {Array} Assinaturas ativas no período
  */
 export function getSubscriptionsForMonth(subscriptions, month, year) {
   if (!subscriptions || !Array.isArray(subscriptions)) return []
 
-  // Primeiro e último dia do mês em questão
   const firstDayOfMonth = new Date(year, month - 1, 1)
   const lastDayOfMonth = new Date(year, month, 0)
 
   return subscriptions.filter(sub => {
-    // Verifica se está ativa
     if (!sub.active) return false
 
-    // Data de início da assinatura
-    const startDate = new Date(sub.start_date + 'T00:00:00')
-
-    // Se a data de início é posterior ao mês atual, não está ativa ainda
+    const startDate = parseSupabaseDate(sub.start_date)
     if (startDate > lastDayOfMonth) return false
 
-    // Se tem data de término e já terminou antes deste mês, não está ativa
     if (sub.end_date) {
-      const endDate = new Date(sub.end_date + 'T00:00:00')
+      const endDate = parseSupabaseDate(sub.end_date)
       if (endDate < firstDayOfMonth) return false
     }
 
@@ -44,7 +36,7 @@ export function getSubscriptionStatus(subscription) {
   if (!subscription.active) return 'paused'
 
   if (subscription.end_date) {
-    const endDate = new Date(subscription.end_date + 'T00:00:00')
+    const endDate = parseSupabaseDate(subscription.end_date)
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 

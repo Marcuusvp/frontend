@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { toast } from 'sonner'
 import { useBalanceTransactions } from '../hooks/useBalanceTransactions'
+import { useMonthNavigation } from '../hooks/useMonthNavigation'
 import { MonthNavigator } from '../components/MonthNavigator'
 import { BalanceTransactionForm } from '../components/BalanceTransactionForm'
 import { DeleteConfirmModal } from '../components/DeleteConfirmModal'
@@ -15,6 +16,7 @@ import {
   getTransactionTypeLabel,
   formatSignedCurrency,
 } from '../utils/balance'
+import { isDateInMonth, parseSupabaseDate } from '../utils/date'
 import '../styles/balance.css'
 
 export function Balance() {
@@ -28,8 +30,12 @@ export function Balance() {
     deleteTransaction,
   } = useBalanceTransactions()
 
-  const [currentMonth, setCurrentMonth] = useState(() => new Date().getMonth() + 1)
-  const [currentYear, setCurrentYear] = useState(() => new Date().getFullYear())
+  const {
+    month: currentMonth,
+    year: currentYear,
+    goToPrevMonth: handlePrevMonth,
+    goToNextMonth: handleNextMonth,
+  } = useMonthNavigation()
   const [showForm, setShowForm] = useState(false)
   const [editingTransaction, setEditingTransaction] = useState(null)
   const [deletingTransaction, setDeletingTransaction] = useState(null)
@@ -39,10 +45,7 @@ export function Balance() {
   }, [fetchTransactions])
 
   const monthlyTransactions = useMemo(() => {
-    return transactions.filter((t) => {
-      const date = new Date(t.date + 'T00:00:00')
-      return date.getMonth() + 1 === currentMonth && date.getFullYear() === currentYear
-    })
+    return transactions.filter(t => isDateInMonth(t.date, currentMonth, currentYear))
   }, [transactions, currentMonth, currentYear])
 
   const monthlyIncome = useMemo(() => calculateTotalIncome(monthlyTransactions), [monthlyTransactions])
@@ -53,31 +56,13 @@ export function Balance() {
   )
 
   const totalBalance = useMemo(() => {
+    const lastDayOfMonth = new Date(currentYear, currentMonth, 0)
     const pastTransactions = transactions.filter((t) => {
-      const date = new Date(t.date + 'T00:00:00')
-      const currentDate = new Date(currentYear, currentMonth - 1, 31)
-      return date <= currentDate
+      const date = parseSupabaseDate(t.date)
+      return date <= lastDayOfMonth
     })
     return calculateBalance(pastTransactions)
   }, [transactions, currentMonth, currentYear])
-
-  const handlePrevMonth = () => {
-    if (currentMonth === 1) {
-      setCurrentMonth(12)
-      setCurrentYear((prev) => prev - 1)
-    } else {
-      setCurrentMonth((prev) => prev - 1)
-    }
-  }
-
-  const handleNextMonth = () => {
-    if (currentMonth === 12) {
-      setCurrentMonth(1)
-      setCurrentYear((prev) => prev + 1)
-    } else {
-      setCurrentMonth((prev) => prev + 1)
-    }
-  }
 
   const handleAddTransaction = () => {
     setEditingTransaction(null)

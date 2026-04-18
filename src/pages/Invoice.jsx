@@ -5,13 +5,15 @@ import { useCards } from '../hooks/useCards'
 import { usePurchases } from '../hooks/usePurchases'
 import { useSubscriptions } from '../hooks/useSubscriptions'
 import { useInvoicePayments } from '../hooks/useInvoicePayments'
+import { useMonthNavigation } from '../hooks/useMonthNavigation'
 import { MonthNavigator } from '../components/MonthNavigator'
 import { PurchaseForm } from '../components/PurchaseForm'
 import { DeleteConfirmModal } from '../components/DeleteConfirmModal'
 import { LoadingScreen } from '../components/LoadingScreen'
 import { ErrorState } from '../components/ErrorState'
-import { calculateInstallments, formatCurrency, getCurrentMonthYear, getRelevantInvoiceMonth } from '../utils/installments'
+import { calculateInstallments, formatCurrency, getRelevantInvoiceMonth } from '../utils/installments'
 import { getSubscriptionsForMonth } from '../utils/subscriptions'
+import { parseSupabaseDate } from '../utils/date'
 import '../styles/invoice.css'
 
 export function Invoice() {
@@ -22,8 +24,13 @@ export function Invoice() {
   const { subscriptions, loading: loadingSubscriptions, error: errorSubscriptions, fetchSubscriptionsByCard } = useSubscriptions()
   const { payment, loading: loadingPayment, fetchPayment, markAsPaid, unmarkAsPaid } = useInvoicePayments()
 
-  const [currentMonth, setCurrentMonth] = useState(getCurrentMonthYear().month)
-  const [currentYear, setCurrentYear] = useState(getCurrentMonthYear().year)
+  const {
+    month: currentMonth,
+    year: currentYear,
+    goToPrevMonth: handlePrevMonth,
+    goToNextMonth: handleNextMonth,
+    setMonthYear,
+  } = useMonthNavigation()
   const [showForm, setShowForm] = useState(false)
   const [editingPurchase, setEditingPurchase] = useState(null)
   const [deletingPurchase, setDeletingPurchase] = useState(null)
@@ -36,15 +43,13 @@ export function Invoice() {
     fetchCards()
   }, [fetchCards])
 
-  // Ao carregar o cartão, ajustar o mês para a fatura relevante (aberta)
   useEffect(() => {
     if (card && !initialMonthSet) {
       const { month, year } = getRelevantInvoiceMonth(card)
-      setCurrentMonth(month)
-      setCurrentYear(year)
+      setMonthYear(month, year)
       setInitialMonthSet(true)
     }
-  }, [card, initialMonthSet])
+  }, [card, initialMonthSet, setMonthYear])
 
   useEffect(() => {
     if (cardId) {
@@ -81,7 +86,7 @@ export function Invoice() {
       }
     })
 
-    return items.sort((a, b) => new Date(b.purchase_date) - new Date(a.purchase_date))
+    return items.sort((a, b) => parseSupabaseDate(b.purchase_date) - parseSupabaseDate(a.purchase_date))
   }, [purchases, card, currentMonth, currentYear])
 
   const monthlySubscriptions = useMemo(() => {
@@ -99,24 +104,6 @@ export function Invoice() {
   const totalAmount = useMemo(() => {
     return totalPurchases + totalSubscriptions
   }, [totalPurchases, totalSubscriptions])
-
-  const handlePrevMonth = () => {
-    if (currentMonth === 1) {
-      setCurrentMonth(12)
-      setCurrentYear(prev => prev - 1)
-    } else {
-      setCurrentMonth(prev => prev - 1)
-    }
-  }
-
-  const handleNextMonth = () => {
-    if (currentMonth === 12) {
-      setCurrentMonth(1)
-      setCurrentYear(prev => prev + 1)
-    } else {
-      setCurrentMonth(prev => prev + 1)
-    }
-  }
 
   const handleAddPurchase = () => {
     setEditingPurchase(null)

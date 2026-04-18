@@ -1,20 +1,14 @@
 import { formatCurrency } from './installments'
+import { isDateInMonth } from './date'
 export { formatCurrency }
 
 /**
  * Filtra transações por mês e ano
- * @param {Array} transactions - Lista de transações
- * @param {number} month - Mês (1-12)
- * @param {number} year - Ano
- * @returns {Array} Transações do mês
  */
 export function filterTransactionsByMonth(transactions, month, year) {
   if (!transactions || !Array.isArray(transactions)) return []
 
-  return transactions.filter(t => {
-    const date = new Date(t.date + 'T00:00:00')
-    return date.getMonth() + 1 === month && date.getFullYear() === year
-  })
+  return transactions.filter(t => isDateInMonth(t.date, month, year))
 }
 
 /**

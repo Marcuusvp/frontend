@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from './useAuth'
 
@@ -8,8 +8,12 @@ export function useInvoicePayments() {
   const [loading, setLoading] = useState(false)
   const { user } = useAuth()
 
+  const requestIdRef = useRef(0)
+
   const fetchPayment = useCallback(async (cardId, month, year) => {
     if (!user || !cardId) return
+
+    const requestId = ++requestIdRef.current
 
     try {
       const { data, error } = await supabase
@@ -21,10 +25,16 @@ export function useInvoicePayments() {
         .maybeSingle()
 
       if (error) throw error
-      setPayment(data)
+
+      if (requestId === requestIdRef.current) {
+        setPayment(data)
+      }
+
       return data
     } catch (err) {
-      console.error('Erro ao buscar pagamento:', err)
+      if (requestId === requestIdRef.current) {
+        console.error('Erro ao buscar pagamento:', err)
+      }
       return null
     }
   }, [user])

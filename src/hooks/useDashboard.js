@@ -21,48 +21,47 @@ export function useDashboard() {
     setError(null)
 
     try {
-      const { data: cardsData, error: cardsError } = await supabase
-        .from('cards')
-        .select('*')
-        .order('created_at', { ascending: false })
+      const [
+        { data: cardsData, error: cardsError },
+        { data: purchasesData, error: purchasesError },
+        { data: subscriptionsData, error: subscriptionsError },
+        { data: transactionsData, error: transactionsError },
+      ] = await Promise.all([
+        supabase
+          .from('cards')
+          .select('*')
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('purchases')
+          .select('*'),
+        supabase
+          .from('subscriptions')
+          .select('*'),
+        supabase
+          .from('balance_transactions')
+          .select('*')
+          .order('date', { ascending: false }),
+      ])
 
-      if (cardsError) throw cardsError
+      const firstError = cardsError || purchasesError || subscriptionsError || transactionsError
+      if (firstError) throw firstError
 
-      const { data: purchasesData, error: purchasesError } = await supabase
-        .from('purchases')
-        .select('*')
-
-      if (purchasesError) throw purchasesError
-
-      const { data: subscriptionsData, error: subscriptionsError } = await supabase
-        .from('subscriptions')
-        .select('*')
-
-      if (subscriptionsError) throw subscriptionsError
-
-      // Buscar TODAS as transações (sem limit) para saldo correto
-      const { data: transactionsData, error: transactionsError } = await supabase
-        .from('balance_transactions')
-        .select('*')
-        .order('date', { ascending: false })
-
-      if (transactionsError) throw transactionsError
-
-      setCards(cardsData || [])
-      setPurchases(purchasesData || [])
-      setSubscriptions(subscriptionsData || [])
-      setTransactions(transactionsData || [])
-
-      // Buscar pagamentos de fatura se houver cartões
-      if (cardsData && cardsData.length > 0) {
-        const { data: paymentsData, error: paymentsError } = await supabase
+      let paymentsData = []
+      if (cardsData?.length > 0) {
+        const { data, error: paymentsError } = await supabase
           .from('invoice_payments')
           .select('*')
           .in('card_id', cardsData.map(c => c.id))
 
         if (paymentsError) throw paymentsError
-        setInvoicePayments(paymentsData || [])
+        paymentsData = data || []
       }
+
+      setCards(cardsData || [])
+      setPurchases(purchasesData || [])
+      setSubscriptions(subscriptionsData || [])
+      setTransactions(transactionsData || [])
+      setInvoicePayments(paymentsData)
     } catch (err) {
       setError(err.message)
     } finally {

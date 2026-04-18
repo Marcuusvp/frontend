@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useCards } from '../hooks/useCards'
 import { EmptyState } from '../components/EmptyState'
 import { CardItem } from '../components/CardItem'
@@ -9,6 +10,7 @@ import { ErrorState } from '../components/ErrorState'
 import '../styles/cards.css'
 
 export function Cards() {
+  const navigate = useNavigate()
   const { cards, loading, error, fetchCards, createCard, updateCard, deleteCard } = useCards()
   const [showForm, setShowForm] = useState(false)
   const [editingCard, setEditingCard] = useState(null)
@@ -45,6 +47,7 @@ export function Cards() {
     const result = await deleteCard(deletingCard.id)
     if (!result.error) {
       setDeletingCard(null)
+      navigate('/cards', { replace: true })
     }
     return result
   }
