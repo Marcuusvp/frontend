@@ -1,0 +1,210 @@
+{
+  "main": {
+    "id": "07cd02e76c359aef",
+    "type": "split",
+    "children": [
+      {
+        "id": "116372fcd0c7958a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "2e98db9afdb22e2d",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "raw/ProjectOverview.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "ProjectOverview"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "6fb0fb0ab3d1f690",
+    "type": "split",
+    "children": [
+      {
+        "id": "0d7767af5fd2c9b7",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "fdff7e4547b1e90f",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Explorador de arquivos"
+            }
+          },
+          {
+            "id": "caf3b60815c90802",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Procurar"
+            }
+          },
+          {
+            "id": "6936e861dead1f4c",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Marcadores"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "98e9f818d232e567",
+    "type": "split",
+    "children": [
+      {
+        "id": "c8a882480a1fa0c2",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "0e1ec8581632af6b",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "raw/ProjectOverview.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Links inversos para ProjectOverview"
+            }
+          },
+          {
+            "id": "6372e479a3db755a",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "raw/ProjectOverview.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Links de saída para ProjectOverview"
+            }
+          },
+          {
+            "id": "a0dcadfcfaa3be2d",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Etiquetas"
+            }
+          },
+          {
+            "id": "3230586bb7148830",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "Todas as propriedades"
+            }
+          },
+          {
+            "id": "9dbc269ebe8ae03a",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "raw/ProjectOverview.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Sumário de ProjectOverview"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Abrir a troca rápida": false,
+      "graph:Abrir visualização em gráfico": false,
+      "canvas:Criar novo canvas": false,
+      "daily-notes:Abrir a nota de hoje": false,
+      "templates:Inserir modelo": false,
+      "command-palette:Abrir paleta de comandos": false,
+      "bases:Criar nova base": false
+    }
+  },
+  "active": "2e98db9afdb22e2d",
+  "lastOpenFiles": [
+    "wiki/log.md",
+    "wiki/architecture.md",
+    "CLAUDE.md.md",
+    "wiki/log.md.tmp.124719.1776477157649",
+    "wiki/index.md",
+    "wiki/index.md.tmp.124719.1776477157483",
+    "wiki/styling.md",
+    "wiki/styling.md.tmp.124719.1776477140426",
+    "wiki/component-patterns.md",
+    "wiki/business-logic.md",
+    "wiki/data-model.md",
+    "wiki/data-model.md.tmp.124719.1776477139686",
+    "wiki/architecture.md.tmp.124719.1776477139445",
+    "wiki/project-overview.md",
+    "CLAUDE.md",
+    "raw/ProjectOverview.md",
+    "Sem título.md",
+    "Bem-vindo.md",
+    "templates",
+    "wiki",
+    "raw"
+  ]
+}
