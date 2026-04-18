@@ -13,9 +13,9 @@ npm run dev       # Start dev server (Vite)
 npm run build     # Production build
 npm run lint      # ESLint check
 npm run preview   # Preview production build locally
+npm test          # Vitest in watch mode
+npm run test:run  # Vitest single run (CI)
 ```
-
-No test framework is configured.
 
 ## Environment Variables
 
@@ -46,12 +46,15 @@ No service/API layer. Hooks query Supabase tables directly via the client in `sr
 
 ### Key Business Logic (src/utils/)
 
+- **date.js**: Safe date parsing from Supabase — `parseSupabaseDate()` appends `T00:00:00` to prevent UTC offset day-shift. All other utils and pages should use these helpers instead of raw `new Date(dateStr)`.
 - **installments.js**: Installment engine — each installment's billing month depends on the card's `closing_day`. Purchases after closing day shift to next month. Last installment absorbs rounding.
 - **subscriptions.js**: Filters active subscriptions by start/end date against a target month.
 - **balance.js**: Transaction aggregation (income/expense/balance totals).
 - **errors.js**: Maps Supabase error codes to friendly Portuguese messages.
 
 ### Invoice Payment Flow (useInvoicePayments)
+
+`fetchPayment` uses a `requestIdRef` counter to discard stale responses when the user navigates months rapidly.
 
 Marking an invoice paid creates both a `balance_transactions` expense AND an `invoice_payments` record. Unmarking deletes both. Adding a purchase to a paid invoice auto-reopens it if before the closing day.
 
@@ -61,7 +64,8 @@ Marking an invoice paid creates both a `balance_transactions` expense AND an `in
 - `getInitialFormData()` factories generate form state from an optional existing entity.
 - Pages follow: loading -> error -> empty state -> data list pattern.
 - `DeleteConfirmModal` and `MonthNavigator` are shared across pages.
-- All page components use named exports (not default exports).
+- `useMonthNavigation` hook manages month/year state for Invoice and Balance pages.
+- All page and hook modules use named exports (not default exports).
 
 ### Styling
 

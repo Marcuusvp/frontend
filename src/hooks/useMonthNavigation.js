@@ -6,8 +6,8 @@ import { useState } from 'react'
 export function useMonthNavigation(initialMonth, initialYear) {
   const now = new Date()
 
-  const [month, setMonth] = useState(initialMonth ?? now.getMonth() + 1)
-  const [year, setYear] = useState(initialYear ?? now.getFullYear())
+  const [month, setMonth] = useState(() => initialMonth ?? new Date().getMonth() + 1)
+const [year, setYear] = useState(() => initialYear ?? new Date().getFullYear())
 
   const goToPrevMonth = () => {
     if (month === 1) {

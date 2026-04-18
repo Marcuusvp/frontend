@@ -48,6 +48,7 @@ export function Cards() {
     if (!result.error) {
       setDeletingCard(null)
       navigate('/cards', { replace: true })
+      toast.success(`Cartão "${deletingCard.name}" excluído.`)
     }
     return result
   }
