@@ -1,13 +1,18 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDashboard } from '../hooks/useDashboard'
+import { usePurchases } from '../hooks/usePurchases'
+import { useBalanceTransactions } from '../hooks/useBalanceTransactions'
 import { LoadingScreen } from '../components/LoadingScreen'
 import { ErrorState } from '../components/ErrorState'
+import { QuickEntryForm } from '../components/QuickEntryForm'
 import { formatCurrency, formatMonth as formatMonthName } from '../utils/installments'
 import { getTransactionTypeColor } from '../utils/balance'
 import '../styles/dashboard.css'
 
 export function Dashboard() {
   const navigate = useNavigate()
+  const [showQuickEntry, setShowQuickEntry] = useState(false)
   const {
     cards,
     transactions,
@@ -17,7 +22,10 @@ export function Dashboard() {
     cardInvoices,
     loading,
     error,
+    fetchDashboardData,
   } = useDashboard()
+  const { createPurchase } = usePurchases()
+  const { createTransaction } = useBalanceTransactions()
 
   const handleCardClick = (cardId) => {
     navigate(`/cards/${cardId}/invoice`)
@@ -51,6 +59,13 @@ export function Dashboard() {
           <h1>Visão Geral</h1>
           <p className="page-subtitle">{formatMonth()}</p>
         </div>
+        <button className="btn-primary quick-entry-btn" onClick={() => setShowQuickEntry(true)}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Novo Lançamento
+        </button>
       </header>
 
       <main className="dashboard-main">
@@ -261,6 +276,23 @@ export function Dashboard() {
           </div>
         </section>
       </main>
+
+      {showQuickEntry && (
+        <QuickEntryForm
+          cards={cards}
+          onClose={() => setShowQuickEntry(false)}
+          onSubmitPurchase={async (data) => {
+            const result = await createPurchase(data)
+            if (!result.error) fetchDashboardData()
+            return result
+          }}
+          onSubmitTransaction={async (data) => {
+            const result = await createTransaction(data)
+            if (!result.error) fetchDashboardData()
+            return result
+          }}
+        />
+      )}
     </div>
   )
 }

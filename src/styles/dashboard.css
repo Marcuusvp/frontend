@@ -274,6 +274,58 @@
 }
 
 /* Quick Actions */
+.quick-entry-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  white-space: nowrap;
+  padding: var(--space-md) var(--space-xl);
+  font-size: var(--font-size-base);
+}
+
+.quick-entry-btn svg {
+  flex-shrink: 0;
+}
+
+/* Payment Type Selector */
+.payment-type-selector {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.payment-type-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 2px solid var(--color-border-medium);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.payment-type-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-text);
+}
+
+.payment-type-btn.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-alpha-10);
+  color: var(--color-primary);
+}
+
+.payment-type-btn svg {
+  flex-shrink: 0;
+}
+
+/* Quick Actions */
 .quick-actions h2 {
   color: var(--color-text);
   font-size: var(--font-size-2xl);
@@ -364,6 +416,16 @@
     flex-direction: column;
     align-items: flex-start;
     gap: var(--space-sm);
+  }
+
+  .dashboard-page .page-header {
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+
+  .quick-entry-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 
