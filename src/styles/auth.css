@@ -5,29 +5,76 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-text) 100%);
+  background:
+    radial-gradient(1200px 600px at 10% 10%, rgba(109, 86, 184, 0.35), transparent 60%),
+    radial-gradient(900px 500px at 90% 90%, rgba(74, 58, 130, 0.45), transparent 60%),
+    linear-gradient(135deg, #1f1738 0%, #2d2155 50%, #4a3a82 100%);
   padding: var(--space-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-page::before,
+.auth-page::after {
+  content: '';
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.auth-page::before {
+  background: #6d56b8;
+  top: -120px;
+  left: -120px;
+}
+
+.auth-page::after {
+  background: #3b82f6;
+  bottom: -140px;
+  right: -140px;
+  opacity: 0.25;
 }
 
 .auth-container {
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
   background: var(--color-surface);
   border-radius: var(--radius-xl);
-  padding: 40px;
+  padding: 44px 40px;
   box-shadow: var(--shadow-xl);
+  position: relative;
+  z-index: 1;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.auth-container::before {
+  content: '';
+  display: block;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto var(--space-lg);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), transparent 60%),
+    var(--gradient-brand);
+  box-shadow: 0 8px 24px rgba(87, 68, 154, 0.35);
 }
 
 .auth-container h1 {
   color: var(--color-text);
   font-size: var(--font-size-4xl);
   font-weight: 700;
+  letter-spacing: -0.03em;
   text-align: center;
-  margin-bottom: var(--space-sm);
+  margin: 0 0 var(--space-sm);
 }
 
 .auth-subtitle {
-  color: var(--color-primary);
+  color: var(--color-text-secondary);
   text-align: center;
   font-size: var(--font-size-base);
   margin-bottom: var(--space-3xl);
@@ -45,6 +92,8 @@
   flex-direction: column;
   gap: var(--space-md);
   text-align: center;
+  padding-top: var(--space-xl);
+  border-top: 1px solid var(--color-border-light);
 }
 
 .auth-links a {

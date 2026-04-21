@@ -5,12 +5,12 @@
 }
 
 .profile-main {
-  max-width: 600px;
+  max-width: 640px;
   margin: 0 auto;
   padding: var(--space-3xl);
   display: flex;
   flex-direction: column;
-  gap: var(--space-3xl);
+  gap: var(--space-2xl);
 }
 
 .profile-section {
@@ -18,15 +18,17 @@
   padding: var(--space-2xl);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border-light);
 }
 
 .profile-section-title {
   color: var(--color-text);
   font-size: var(--font-size-xl);
   font-weight: 600;
+  letter-spacing: -0.02em;
   margin: 0 0 var(--space-xl);
   padding-bottom: var(--space-md);
-  border-bottom: 2px solid var(--color-border-light);
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .profile-form {
@@ -36,17 +38,20 @@
 }
 
 .form-input {
-  padding: var(--space-md) var(--space-lg);
-  border: 2px solid var(--color-primary-light);
+  padding: 12px var(--space-lg);
+  border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-md);
   font-size: var(--font-size-md);
+  font-family: var(--font-sans);
   color: var(--color-text);
-  transition: border-color 0.2s ease;
+  background: var(--color-surface);
+  transition: var(--transition-fast);
   outline: none;
 }
 
 .form-input:focus {
   border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px var(--color-primary-alpha-15);
 }
 
 .form-input.disabled {
@@ -57,7 +62,8 @@
 
 /* Danger Zone */
 .danger-zone {
-  border: 2px solid var(--color-danger-light);
+  border: 1px solid var(--color-danger-light);
+  background: linear-gradient(180deg, var(--color-surface), rgba(239, 68, 68, 0.02));
 }
 
 .danger-zone .profile-section-title {

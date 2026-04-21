@@ -3,17 +3,17 @@ export function EmptyState({ title, description, actionLabel, onAction }) {
     <div className="empty-state">
       <div className="empty-state-icon">
         <svg
-          width="64"
-          height="64"
+          width="44"
+          height="44"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="#57449a"
-          strokeWidth="1.5"
+          stroke="currentColor"
+          strokeWidth="1.75"
           strokeLinecap="round"
           strokeLinejoin="round"
         >
-          <rect x="2" y="5" width="20" height="14" rx="2" />
-          <line x1="2" y1="10" x2="22" y2="10" />
+          <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+          <polyline points="22 4 12 14.01 9 11.01" />
         </svg>
       </div>
       <h3 className="empty-state-title">{title}</h3>
