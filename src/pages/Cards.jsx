@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 import { useCards } from '../hooks/useCards'
 import { EmptyState } from '../components/EmptyState'
 import { CardItem } from '../components/CardItem'
@@ -32,6 +33,11 @@ export function Cards() {
 
   const handleDelete = (card) => {
     setDeletingCard(card)
+  }
+
+  const handleCloseForm = () => {
+    setShowForm(false)
+    setEditingCard(null)
   }
 
   const handleSubmit = async (formData) => {
@@ -104,7 +110,7 @@ export function Cards() {
         <CardForm
           key={editingCard?.id || 'new'}
           card={editingCard}
-          onClose={() => setShowForm(false)}
+          onClose={handleCloseForm}
           onSubmit={handleSubmit}
         />
       )}
